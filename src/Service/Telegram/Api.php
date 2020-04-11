@@ -24,18 +24,37 @@ class Api
 
     public function sendMessage(int $chat_id, string $message)
     {
+        if (empty(trim($message))) {
+            return;
+        }
+
         $options = [
             'chat_id' => $chat_id,
             'disable_web_page_preview' => true,
         ];
+
         while (mb_strlen($message) > 4096) {
             $options['text'] = mb_substr($message, 0, 4096);
             $this->send('sendMessage', $options);
             $message = mb_substr($message, 4096);
         }
+
         $options['text'] = $message;
         $this->send('sendMessage', $options);
+    }
 
+    public function sendPhoto(int $chat_id, string $url, string $caption = '')
+    {
+        $options = [
+            'chat_id' => $chat_id,
+            'photo' => $url,
+            'disable_web_page_preview' => true,
+        ];
+        if ($caption) {
+            $caption = mb_strlen($caption) > 1024 ? mb_substr($caption, 1024) : $caption;
+            $options['caption'] = $caption;
+        }
+        $this->send('sendPhoto', $options);
     }
 
     public function sendMessageWithReplyKeyboard(int $chat_id, string $message, array $options)

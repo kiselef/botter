@@ -1,6 +1,6 @@
 {
   "name": "avocado-bot",
-  "description": "Simple Smm Bot",
+  "description": "Botter",
   "require": {
     "php": ">=7.2",
     "php-di/php-di": "^6.0",

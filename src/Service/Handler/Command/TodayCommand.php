@@ -11,7 +11,7 @@ use VK\OAuth\VKOAuthResponseType;
 class TodayCommand extends VkCommand
 {
     const
-        DEFAULT_POST_NUMBER = 1,
+        DEFAULT_POST_NUMBER = 10,
         DEFAULT_GROUP_ID = 27838907;
 
     public function execute() : void
@@ -20,17 +20,34 @@ class TodayCommand extends VkCommand
             $owner_id = $this->args[0];
             $limit = $this->args[1] ?? self::DEFAULT_POST_NUMBER;
             $response = $this->vk->wall($owner_id, $limit);
-            $this->result[] = $this->getTodayStat($response);
+
+            $this->result = $this->getNewPosts($response);
         }
     }
 
-    private function getTodayStat(array $info = [])
+    private function getLastDatePostByOwnerId(int $owner_id)
     {
-        $group_name = $info['groups'] ? $info['groups'][0]['name'] : 'No Name';
-        $result = "<$group_name>";
+        $filename = __DIR__ . '/../log/command/histories/today-' . $owner_id;
+
+        return file_exists($filename) ? intval(file_get_contents($filename)) : 0;
+    }
+
+    private function setLastDatePostByOwnerId(int $owner_id, int $timestamp)
+    {
+        $filename = __DIR__ . '/../log/command/histories/today-' . $owner_id;
+
+        return file_put_contents($filename, $timestamp);
+    }
+
+    private function getNewPosts(array $info = [])
+    {
+        $result = [];
+        $date = $this->getLastDatePostByOwnerId($info['groups'][0]['id']);
         foreach ($info['items'] as $item) {
+            if ($item['date'] <= $date) {
+                continue;
+            }
             $content_info = [
-                'name' => $group_name,
                 'content' => $item['text'],
                 'comments' => $item['comments']['count'],
                 'likes' => $item['comments']['count'],
@@ -39,28 +56,51 @@ class TodayCommand extends VkCommand
             if (isset($item['attachments'])) {
                 $attaches = $item['attachments'];
                 foreach ($attaches as $attach) {
+                    // TODO: use $attach['type'] (link, photo)
                     if (isset($attach['link'])) {
                         $content_info['link_source'] = $attach['link']['url'];
+                    }
+                    if (isset($attach['photo'])) {
+                        $attachment = [
+                            'type' => 'photo',
+                            'url' => array_pop($attach['photo']['sizes'])['url']
+                        ];
                     }
                 }
 
             }
 
-            $result .= "\n\n{$content_info['content']}\n{$content_info['link_vk']}";
+            $text = "\n{$content_info['content']}\n{$content_info['link_vk']}";
             if (isset($content_info['link_source'])) {
-                $result .= PHP_EOL . $content_info['link_source'] . PHP_EOL;
+                $text .= PHP_EOL . $content_info['link_source'] . PHP_EOL;
             }
 
             if ($content_info['comments'] > 15) {
-                $result .= "\nКомментариев: {$content_info['comments']}";
+                $text .= "\nКомментариев: {$content_info['comments']}";
             }
+
+            $r = compact('text');
+            if (isset($attachment)) {
+                $r['attachment'] = $attachment;
+            }
+            $result[] = $r;
+
         }
 
-        return $result;
+        if ($result) {
+            $group_name = $info['groups'] ? $info['groups'][0]['name'] : 'No Name';
+            $item = array_shift($info['items']);
+            $title = "<$group_name>";
+            $this->setLastDatePostByOwnerId(abs($item['owner_id']), $item['date']);
+
+            return array_merge(compact('title'), compact('result'));
+        }
+
+        return [];
     }
 
     public function getResult()
     {
-        return join("\n", $this->result);
+        return $this->result;
     }
 }

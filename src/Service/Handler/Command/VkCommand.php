@@ -10,6 +10,8 @@ use App\Service\Handler\VKApi;
  */
 abstract class VkCommand extends BaseCommand
 {
+    protected $text = '';
+    protected $attachment = [];
     protected $vk;
 
     public function __construct(array $args = [])
@@ -24,5 +26,15 @@ abstract class VkCommand extends BaseCommand
     {
         $config = include __DIR__ . '/../config.php';
         return $config['vk'];
+    }
+
+    public function setText(string $text)
+    {
+        $this->text = $text;
+    }
+
+    public function setAttachment(string $type, string $url)
+    {
+        $this->attachment = compact('type', 'url');
     }
 }

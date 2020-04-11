@@ -18,6 +18,7 @@ function execute(string $command_name)
 
     $config = require 'config.php';
 
+    /* @var \App\Service\Handler\Command\VkCommand $command */
     $command = \App\Service\Handler\Factory\CommandFactory::create($command_name);
     $command->execute();
 
@@ -25,7 +26,25 @@ function execute(string $command_name)
     $chat_id = $config['telegram']['default_chat_id'];
 
     $telegram = new \App\Service\Telegram\Api($token);
-    $telegram->sendMessage($chat_id, $command->getResult());
+
+    if ($data = $command->getResult()) {
+        if (count($data['result']) === 1
+            && isset($data['result'][0]['attachment'])
+            && $data['result'][0]['attachment']['type'] === 'photo'
+        ) {
+            $text = $data['title'] . $data['result'][0]['text'];
+            $photo_url =  $data['result'][0]['attachment']['url'];
+            $telegram->sendPhoto($chat_id, $photo_url, $text);
+        } else {
+            $text = $data['title'];
+            foreach ($data['result'] as $result) {
+                $text .= $result['text'];
+            }
+            $telegram->sendMessage($chat_id, $text);
+        }
+    }
+
+    echo json_encode('OK');
 }
 
 

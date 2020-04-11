@@ -26,5 +26,4 @@ if ($path === '/hook') {
         $telegram->sendMessage($chat_id, $command->getResult());
     }
 
-    echo json_encode('OK');
 }
