@@ -2,11 +2,9 @@
 
 namespace App\Service\Handler\Command;
 
-use VK\Client\VKApiClient;
-use VK\OAuth\Scopes\VKOAuthUserScope;
-use VK\OAuth\VKOAuth;
-use VK\OAuth\VKOAuthDisplay;
-use VK\OAuth\VKOAuthResponseType;
+use App\Service\Handler\Factory\FromVkPostTelegramMessageFactory;
+use App\Service\Handler\VkPost;
+use App\Service\Telegram\Sender;
 
 class TodayCommand extends VkCommand
 {
@@ -20,8 +18,25 @@ class TodayCommand extends VkCommand
             $owner_id = $this->args[0];
             $limit = $this->args[1] ?? self::DEFAULT_POST_NUMBER;
             $response = $this->vk->wall($owner_id, $limit);
+            //$group_name = $response['groups'] ? $response['groups'][0]['name'] : 'No Name';
+            $posts = $this->getNewPosts($response);
 
-            $this->result = $this->getNewPosts($response);
+            $sender = new Sender($this->api);
+            /* @var \App\Service\Handler\VkPost $post */
+            foreach ($posts as $post) {
+                try {
+                    $message = FromVkPostTelegramMessageFactory::create($post);
+                    if ($sender->send($this->chat_id, $message) !== false) {
+                        $last_success_post = $post;
+                    }
+                } catch (\Exception $e) {
+                    // log
+                }
+            }
+
+            if (isset($last_success_post)) {
+                $this->setLastDatePostByOwnerId($owner_id, $last_success_post->date);
+            }
         }
     }
 
@@ -47,56 +62,14 @@ class TodayCommand extends VkCommand
             if ($item['date'] <= $date) {
                 continue;
             }
-            $content_info = [
-                'content' => $item['text'],
-                'comments' => $item['comments']['count'],
-                'likes' => $item['comments']['count'],
-                'link_vk' => 'https://vk.com/wall-' . abs($item['owner_id']) . '_' . $item['id'],
-            ];
-            if (isset($item['attachments'])) {
-                $attaches = $item['attachments'];
-                foreach ($attaches as $attach) {
-                    // TODO: use $attach['type'] (link, photo)
-                    if (isset($attach['link'])) {
-                        $content_info['link_source'] = $attach['link']['url'];
-                    }
-                    if (isset($attach['photo'])) {
-                        $attachment = [
-                            'type' => 'photo',
-                            'url' => array_pop($attach['photo']['sizes'])['url']
-                        ];
-                    }
-                }
-
-            }
-
-            $text = "\n{$content_info['content']}\n{$content_info['link_vk']}";
-            if (isset($content_info['link_source'])) {
-                $text .= PHP_EOL . $content_info['link_source'] . PHP_EOL;
-            }
-
-            if ($content_info['comments'] > 15) {
-                $text .= "\nКомментариев: {$content_info['comments']}";
-            }
-
-            $r = compact('text');
-            if (isset($attachment)) {
-                $r['attachment'] = $attachment;
-            }
-            $result[] = $r;
-
+            $result[] = new VkPost($item);
         }
 
-        if ($result) {
-            $group_name = $info['groups'] ? $info['groups'][0]['name'] : 'No Name';
-            $item = array_shift($info['items']);
-            $title = "<$group_name>";
-            $this->setLastDatePostByOwnerId(abs($item['owner_id']), $item['date']);
+        usort($result, function($a, $b) {
+            return $a->date > $b->date ? 1 : -1;
+        });
 
-            return array_merge(compact('title'), compact('result'));
-        }
-
-        return [];
+        return $result;
     }
 
     public function getResult()

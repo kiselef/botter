@@ -17,15 +17,17 @@ class Api
 
     public function send(string $method, array $data)
     {
-        $this->client->post($this->getMethodUrl($method), [
+        $response = $this->client->post($this->getMethodUrl($method), [
             'form_params' => $data
         ]);
+
+        return $response->getBody()->getContents();
     }
 
     public function sendMessage(int $chat_id, string $message)
     {
         if (empty(trim($message))) {
-            return;
+            return false;
         }
 
         $options = [
@@ -40,7 +42,7 @@ class Api
         }
 
         $options['text'] = $message;
-        $this->send('sendMessage', $options);
+        return $this->send('sendMessage', $options);
     }
 
     public function sendPhoto(int $chat_id, string $url, string $caption = '')
@@ -54,7 +56,7 @@ class Api
             $caption = mb_strlen($caption) > 1024 ? mb_substr($caption, 1024) : $caption;
             $options['caption'] = $caption;
         }
-        $this->send('sendPhoto', $options);
+        return $this->send('sendPhoto', $options);
     }
 
     public function sendMessageWithReplyKeyboard(int $chat_id, string $message, array $options)
