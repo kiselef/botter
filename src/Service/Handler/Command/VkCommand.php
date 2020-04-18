@@ -33,7 +33,7 @@ abstract class VkCommand extends BaseCommand
         return file_exists($filename) ? intval(file_get_contents($filename)) : 0;
     }
 
-    protected function setLastDatePostByOwnerId(int $owner_id, int $timestamp)
+    protected function setLastDatePostByOwnerId(int $owner_id, $timestamp)
     {
         $filename = __DIR__ . '/../log/command/histories/' . $this->getName() . $owner_id;
 

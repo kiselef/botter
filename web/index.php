@@ -14,15 +14,10 @@ if (strpos($path, '/hook') !== false) {
     if ($request->isPost()
         && $request_data = json_decode($request->postRaw(), true)
     ) {
-        if ($request['entities']['type'] !== 'bot_command') {
-            exit;
-        }
-
         $user_command = $request_data['message']['text'];
-        $chat_id = $request_data['chat']['id'];
+        $chat_id = $request_data['message']['chat']['id'];
 
         $token = $config['telegram']['token'];
-        $chat_id = $config['telegram']['default_chat_id'];
 
         $telegram = new Api($token);
 
