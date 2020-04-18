@@ -11,22 +11,22 @@ class FromVkPostTelegramMessageFactory
 {
     public static function create(VkPost $post) : TelegramMessage
     {
+        $text = $post->text . PHP_EOL . $post->link_vk;
+
         if ($post->isPhoto()) {
             $message = new PhotoMessage([
-                'caption' => $post->text,
+                'caption' => $text,
                 'photo' => $post->attach['url'],
             ]);
         } else {
             $message = new PlainMessage([
-                'text' => $post->text,
+                'text' => $text,
             ]);
         }
 
         if ($message->isValid() === false) {
             throw new \InvalidArgumentException('Required options can not be empty.');
         }
-
-        $message->addText(PHP_EOL . $post->link_vk);
 
         return $message;
     }

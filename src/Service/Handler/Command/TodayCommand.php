@@ -9,7 +9,7 @@ use App\Service\Telegram\Sender;
 class TodayCommand extends VkCommand
 {
     const
-        DEFAULT_POST_NUMBER = 10,
+        DEFAULT_POST_NUMBER = 5,
         DEFAULT_GROUP_ID = 27838907;
 
     public function execute() : void
@@ -40,20 +40,6 @@ class TodayCommand extends VkCommand
         }
     }
 
-    private function getLastDatePostByOwnerId(int $owner_id)
-    {
-        $filename = __DIR__ . '/../log/command/histories/today-' . $owner_id;
-
-        return file_exists($filename) ? intval(file_get_contents($filename)) : 0;
-    }
-
-    private function setLastDatePostByOwnerId(int $owner_id, int $timestamp)
-    {
-        $filename = __DIR__ . '/../log/command/histories/today-' . $owner_id;
-
-        return file_put_contents($filename, $timestamp);
-    }
-
     private function getNewPosts(array $info = [])
     {
         $result = [];
@@ -70,10 +56,5 @@ class TodayCommand extends VkCommand
         });
 
         return $result;
-    }
-
-    public function getResult()
-    {
-        return $this->result;
     }
 }

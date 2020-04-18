@@ -30,4 +30,11 @@ class VKApi
             'extended' => 1,
         ]);
     }
+
+    public function groupsGetByIds(array $ids)
+    {
+        return $this->client->groups()->getById($this->token, [
+            'group_ids' => $ids
+        ]);
+    }
 }

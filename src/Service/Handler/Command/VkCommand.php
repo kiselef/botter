@@ -10,8 +10,6 @@ use App\Service\Handler\VKApi;
  */
 abstract class VkCommand extends BaseCommand
 {
-    protected $text = '';
-    protected $attachment = [];
     protected $vk;
 
     public function __construct(array $args = [])
@@ -28,13 +26,17 @@ abstract class VkCommand extends BaseCommand
         return $config['vk'];
     }
 
-    public function setText(string $text)
+    protected function getLastDatePostByOwnerId(int $owner_id)
     {
-        $this->text = $text;
+        $filename = __DIR__ . '/../log/command/histories/' . $this->getName() . $owner_id;
+
+        return file_exists($filename) ? intval(file_get_contents($filename)) : 0;
     }
 
-    public function setAttachment(string $type, string $url)
+    protected function setLastDatePostByOwnerId(int $owner_id, int $timestamp)
     {
-        $this->attachment = compact('type', 'url');
+        $filename = __DIR__ . '/../log/command/histories/' . $this->getName() . $owner_id;
+
+        return file_put_contents($filename, $timestamp);
     }
 }

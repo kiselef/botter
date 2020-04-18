@@ -7,23 +7,29 @@ require '../vendor/autoload.php';
 
 $config = require '../config.php';
 
-$path = $_SERVER['PATH_INFO'] ?? '';
-if ($path === '/hook') {
+$path = $_SERVER['REQUEST_URI'] ?? '';
+if (strpos($path, '/hook') !== false) {
 
     $request = \App\SimpleRequest::instance();
     if ($request->isPost()
         && $request_data = json_decode($request->postRaw(), true)
     ) {
-        $user_command = $request_data['channel_post']['text'];
+        if ($request['entities']['type'] !== 'bot_command') {
+            exit;
+        }
 
-        $command = CommandFactory::create($user_command);
-        $command->execute();
+        $user_command = $request_data['message']['text'];
+        $chat_id = $request_data['chat']['id'];
 
         $token = $config['telegram']['token'];
         $chat_id = $config['telegram']['default_chat_id'];
 
         $telegram = new Api($token);
-        $telegram->sendMessage($chat_id, $command->getResult());
-    }
 
+        $command = CommandFactory::create($user_command);
+        $command->setApi($telegram);
+        $command->setChatId($chat_id);
+
+        $command->execute();
+    }
 }

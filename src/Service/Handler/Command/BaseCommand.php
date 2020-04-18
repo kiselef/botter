@@ -2,7 +2,6 @@
 
 namespace App\Service\Handler\Command;
 
-use App\Service\Handler\Result\BaseResult;
 use App\Service\Telegram\Api;
 
 /**
@@ -30,18 +29,24 @@ abstract class BaseCommand
         return $this->args;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options) : void
     {
         $this->options = $options;
     }
 
-    public function setApi(Api $api)
+    public function setApi(Api $api) : void
     {
         $this->api = $api;
     }
 
-    public function setChatId(int $chat_id)
+    public function setChatId(int $chat_id) : void
     {
         $this->chat_id = $chat_id;
+    }
+
+    public function getName()
+    {
+        preg_match('/\\\\(\w+)Command/', static::class, $matches);
+        return $matches[1];
     }
 }
