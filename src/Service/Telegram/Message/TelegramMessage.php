@@ -10,12 +10,7 @@ abstract class TelegramMessage
     ];
     protected $text_field_name = 'text';
 
-    abstract public function getMethod();
-
-    public function getText()
-    {
-        return $this->options[$this->text_field_name] ?? '';
-    }
+    abstract public function getMethod(): string;
 
     public function addText(string $text)
     {
@@ -46,12 +41,7 @@ abstract class TelegramMessage
         return true;
     }
 
-    public function getTextFieldName()
-    {
-        return $this->text_field_name;
-    }
-
-    public function required()
+    public function required(): array
     {
         return [];
     }

@@ -6,12 +6,12 @@ class PhotoMessage extends TelegramMessage
 {
     protected $text_field_name = 'caption';
 
-    public function getMethod()
+    public function getMethod(): string
     {
         return 'sendPhoto';
     }
 
-    public function required()
+    public function required(): array
     {
         return ['photo'];
     }

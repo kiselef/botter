@@ -9,7 +9,7 @@ use App\Service\Telegram\Message\TelegramMessage;
 
 class FromVkPostTelegramMessageFactory
 {
-    public static function create(VkPost $post) : TelegramMessage
+    public static function create(VkPost $post): TelegramMessage
     {
         $text = $post->text . PHP_EOL . $post->link_vk;
 

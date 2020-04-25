@@ -4,17 +4,12 @@ namespace App\Service\Telegram\Message;
 
 class PlainMessage extends TelegramMessage
 {
-    public function getMethod()
+    public function getMethod(): string
     {
         return 'sendMessage';
     }
 
-    public function getText()
-    {
-        return $this->options['text'] ?? '';
-    }
-
-    public function required()
+    public function required(): array
     {
         return ['text'];
     }
