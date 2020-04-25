@@ -18,7 +18,6 @@ class TodayCommand extends VkCommand
             $owner_id = $this->args[0];
             $limit = $this->args[1] ?? self::DEFAULT_POST_NUMBER;
             $response = $this->vk->wall($owner_id, $limit);
-            //$group_name = $response['groups'] ? $response['groups'][0]['name'] : 'No Name';
             $posts = $this->getNewPosts($response);
 
             $sender = new Sender($this->api);
@@ -30,7 +29,7 @@ class TodayCommand extends VkCommand
                         $last_success_post = $post;
                     }
                 } catch (\Exception $e) {
-                    // log
+                    $this->addWarning($e->getMessage());
                 }
             }
 

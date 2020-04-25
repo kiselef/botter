@@ -22,6 +22,6 @@ class Sender
         $options = $message->getOptions();
         $options['chat_id'] = $chat_id;
 
-        return $this->api->send($message->getMethod(), $options);
+        return new Response(json_decode($this->api->send($message->getMethod(), $options), true));
     }
 }

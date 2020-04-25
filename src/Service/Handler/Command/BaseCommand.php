@@ -15,6 +15,7 @@ abstract class BaseCommand
     protected $chat_id;
     protected $args = [];
     protected $options = [];
+    protected $warnings = [];
 
     abstract public function execute() : void;
 
@@ -48,5 +49,15 @@ abstract class BaseCommand
     {
         preg_match('/\\\\(\w+)Command/', static::class, $matches);
         return $matches[1];
+    }
+
+    protected function addWarning(string $message)
+    {
+        $this->warnings[] = trim($message);
+    }
+
+    public function getWarnings()
+    {
+        return $this->warnings;
     }
 }
