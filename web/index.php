@@ -14,7 +14,8 @@ if (strpos($path, '/hook') !== false) {
     if ($request->isPost()
         && $request_data = json_decode($request->postRaw(), true)
     ) {
-        $user_command = $request_data['message']['text'];
+
+        $user_command = ltrim($request_data['message']['text'], '/');
         $chat_id = $request_data['message']['chat']['id'];
 
         $token = $config['telegram']['token'];

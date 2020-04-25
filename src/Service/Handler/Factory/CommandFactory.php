@@ -9,11 +9,8 @@ class CommandFactory
     public static function create(string $command) : BaseCommand
     {
         $command_args = explode(' ', preg_replace('/[\s\t]+/', ' ', $command));
-        if ($command_args && substr($command_args[0], 0, 1) !== '/') {
-            throw new \Exception('Command name must begins from "/"');
-        }
 
-        $command_name = ucfirst(ltrim(array_shift($command_args), '/'));
+        $command_name = ucfirst(array_shift($command_args));
         $commandClassName = "App\\Service\\Handler\\Command\\{$command_name}Command";
         if (! class_exists($commandClassName)) {
             throw new \InvalidArgumentException("Command $command_name is undefined.");
