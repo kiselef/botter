@@ -29,7 +29,7 @@ function execute(string $command_name)
     $command->setChatId($chat_id);
     $command->execute();
 
-    echo json_encode('OK');
+    echo json_encode($command->getWarnings());
 }
 
 
