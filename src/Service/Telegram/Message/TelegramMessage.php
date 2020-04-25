@@ -4,6 +4,8 @@ namespace App\Service\Telegram\Message;
 
 abstract class TelegramMessage
 {
+    const FORMAT_HTML = 'HTML';
+
     protected $options = [];
     protected $default_options = [
         'disable_web_page_preview' => true,

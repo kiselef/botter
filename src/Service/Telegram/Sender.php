@@ -21,6 +21,7 @@ class Sender
 
         $options = $message->getOptions();
         $options['chat_id'] = $chat_id;
+        $options['parse_mode'] = TelegramMessage::FORMAT_HTML;
 
         return new Response(json_decode($this->api->send($message->getMethod(), $options), true));
     }

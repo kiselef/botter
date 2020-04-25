@@ -33,7 +33,7 @@ class TopStatCommand extends VkCommand
 
         $sender = new Sender($this->api);
         try {
-            $message = new PlainMessage(['text' => View::result('group_stat', compact('posts'))]);
+            $message = new PlainMessage(['text' => View::result('top_stat', compact('posts'))]);
             $response = $sender->send($this->chat_id, $message);
             if (!$response->isSuccess()) {
                 $this->addWarning('Message was not sent.');
