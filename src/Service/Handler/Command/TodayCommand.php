@@ -18,7 +18,7 @@ class TodayCommand extends VkCommand
             $owner_id = $this->args[0];
             $limit = $this->args[1] ?? self::DEFAULT_POST_NUMBER;
             $response = $this->vk->wall($owner_id, $limit);
-            $posts = $this->getNewPosts($response);
+            $posts = $this->getPostsFromResponse($response);
 
             $sender = new Sender($this->api);
             /* @var VKPost $post */
@@ -39,7 +39,12 @@ class TodayCommand extends VkCommand
         }
     }
 
-    private function getNewPosts(array $info = [])
+    private function getPostsFromResponse(array $response)
+    {
+        return $this->getSortedPosts($this->getNewestVKPosts($response));
+    }
+
+    private function getNewestVKPosts(array $info = [])
     {
         $result = [];
         $date = $this->getCommandCache($info['groups'][0]['id']);
@@ -50,10 +55,15 @@ class TodayCommand extends VkCommand
             $result[] = new VKPost($item);
         }
 
-        usort($result, function($a, $b) {
+        return $result;
+    }
+
+    private function getSortedPosts(array $posts)
+    {
+        usort($posts, function($a, $b) {
             return $a->date > $b->date ? 1 : -1;
         });
 
-        return $result;
+        return $posts;
     }
 }
