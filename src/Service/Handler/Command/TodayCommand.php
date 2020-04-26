@@ -2,8 +2,8 @@
 
 namespace App\Service\Handler\Command;
 
-use App\Service\Handler\Factory\FromVkPostTelegramMessageFactory;
-use App\Service\Handler\VkPost;
+use App\Service\Handler\Factory\TelegramMessageFactory;
+use App\Service\VK\Post as VKPost;
 use App\Service\Telegram\Sender;
 
 class TodayCommand extends VkCommand
@@ -12,8 +12,13 @@ class TodayCommand extends VkCommand
         DEFAULT_POST_NUMBER = 5,
         DEFAULT_GROUP_ID = 27838907;
 
-    public function execute() : void
+    public function execute(): void
     {
+
+        $text = 'Рисунок [id82459560|Татьяны Морышковой]';
+        $text = preg_replace('/\[(id\d+)\|(.+)\]/', '<a href="$1">$2</a>', $text);
+        var_dump($text); exit;
+
         if ($this->args) {
             $owner_id = $this->args[0];
             $limit = $this->args[1] ?? self::DEFAULT_POST_NUMBER;
@@ -21,10 +26,10 @@ class TodayCommand extends VkCommand
             $posts = $this->getNewPosts($response);
 
             $sender = new Sender($this->api);
-            /* @var \App\Service\Handler\VkPost $post */
+            /* @var VKPost $post */
             foreach ($posts as $post) {
                 try {
-                    $message = FromVkPostTelegramMessageFactory::create($post);
+                    $message = TelegramMessageFactory::createFromVKPost($post);
                     if ($sender->send($this->chat_id, $message) !== false) {
                         $last_success_post = $post;
                     }
@@ -34,7 +39,7 @@ class TodayCommand extends VkCommand
             }
 
             if (isset($last_success_post)) {
-                $this->setLastDatePostByOwnerId($owner_id, $last_success_post->date);
+                $this->setCommandCache($owner_id, $last_success_post->date);
             }
         }
     }
@@ -42,12 +47,12 @@ class TodayCommand extends VkCommand
     private function getNewPosts(array $info = [])
     {
         $result = [];
-        $date = $this->getLastDatePostByOwnerId($info['groups'][0]['id']);
+        $date = $this->getCommandCache($info['groups'][0]['id']);
         foreach ($info['items'] as $item) {
             if ($item['date'] <= $date) {
                 continue;
             }
-            $result[] = new VkPost($item);
+            $result[] = new VKPost($item);
         }
 
         usort($result, function($a, $b) {

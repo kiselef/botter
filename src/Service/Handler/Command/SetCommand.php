@@ -13,7 +13,7 @@ class SetCommand extends VkCommand
             $response = $this->vk->groupsGetByIds($this->args);
 
             $groups = array_column($response, 'name', 'id');
-            $this->setLastDatePostByOwnerId(100, json_encode($groups));
+            //$this->setLastDatePostByOwnerId(100, json_encode($groups));
 
             $sender = new Sender($this->api);
             $message = new PlainMessage(['text' => 'Настройки успешно установлены. Далее используйте команду "/get".']);

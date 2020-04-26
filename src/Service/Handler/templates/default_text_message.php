@@ -1,4 +1,4 @@
-<?php /* @var \App\Service\Handler\VkPost $post */ ?>
+<?php /* @var \App\Service\VK\Post $post */ ?>
 <?= $post->text ?>
 
 <?= $post->link_vk ?>

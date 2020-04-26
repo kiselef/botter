@@ -2,7 +2,7 @@
 
 namespace App\Service\Handler\Command;
 
-use App\Service\Handler\VKApi;
+use App\Service\VK\Api;
 
 /**
  * Class VkCommand
@@ -17,26 +17,12 @@ abstract class VkCommand extends BaseCommand
         parent::__construct($args);
 
         $token = $this->getVKSettings()['token'];
-        $this->vk = new VKApi($token);
+        $this->vk = new Api($token);
     }
 
     private function getVKSettings()
     {
         $config = include __DIR__ . '/../config.php';
         return $config['vk'];
-    }
-
-    protected function getLastDatePostByOwnerId(int $owner_id)
-    {
-        $filename = __DIR__ . '/../log/command/histories/' . $this->getName() . $owner_id;
-
-        return file_exists($filename) ? intval(file_get_contents($filename)) : 0;
-    }
-
-    protected function setLastDatePostByOwnerId(int $owner_id, $timestamp)
-    {
-        $filename = __DIR__ . '/../log/command/histories/' . $this->getName() . $owner_id;
-
-        return file_put_contents($filename, $timestamp);
     }
 }

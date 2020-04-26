@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Handler;
+namespace App\Service\VK;
 
 /**
  * @property string $title
@@ -16,7 +16,7 @@ namespace App\Service\Handler;
  * @property int $owner_id
  * @package App\Service\Handler
  */
-class VkPost
+class Post
 {
     const ATTACH_TYPE_PHOTO = 'photo';
 
@@ -30,7 +30,7 @@ class VkPost
             'owner_id' => $item['owner_id'],
             'date' => $item['date'],
             'text' => $item['text'],
-            'views' => (int) $item['views']['count'],
+            'views' => isset($item['views']) ? (int) $item['views']['count'] : 0,
             'reposts' => (int) $item['reposts']['count'],
             'comments' => (int) $item['comments']['count'],
             'likes' => (int) $item['likes']['count'],

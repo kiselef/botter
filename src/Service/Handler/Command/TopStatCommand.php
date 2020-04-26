@@ -3,7 +3,7 @@
 namespace App\Service\Handler\Command;
 
 use App\Service\Handler\View;
-use App\Service\Handler\VkPost;
+use App\Service\VK\Post;
 use App\Service\Telegram\Message\PlainMessage;
 use App\Service\Telegram\Sender;
 
@@ -33,7 +33,7 @@ class TopStatCommand extends VkCommand
 
         $sender = new Sender($this->api);
         try {
-            $message = new PlainMessage(['text' => View::result('top_stat', compact('posts'))]);
+            $message = new PlainMessage(['text' => View::resultByVK('top_stat', compact('posts'))]);
             $response = $sender->send($this->chat_id, $message);
             if (!$response->isSuccess()) {
                 $this->addWarning('Message was not sent.');
@@ -59,7 +59,7 @@ class TopStatCommand extends VkCommand
     private function getTopPosts(int $limit = self::DEFAULT_TOP_LIMIT)
     {
         $posts = $this->getAllPosts();
-        usort($posts, function (VkPost $a, VkPost $b) {
+        usort($posts, function (Post $a, Post $b) {
             return $b->getPopularity() <=> $a->getPopularity();
         });
 
@@ -89,7 +89,7 @@ class TopStatCommand extends VkCommand
             if ($item['date'] < $from || $item['date'] >= $to) {
                 continue;
             }
-            $result[] = new VkPost(array_merge($item, [
+            $result[] = new Post(array_merge($item, [
                 'screen_name' => $vk_response['groups'][0]['screen_name']
             ]));
         }

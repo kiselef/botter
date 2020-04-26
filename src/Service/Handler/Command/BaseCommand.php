@@ -60,4 +60,26 @@ abstract class BaseCommand
     {
         return $this->warnings;
     }
+
+    public function getCommandCacheDir()
+    {
+        return __DIR__ . '/../command_cache';
+    }
+
+    protected function getCommandCache($owner_id)
+    {
+        $filename = $this->getCacheFilename($owner_id);
+
+        return file_exists($filename) ? intval(file_get_contents($filename)) : 0;
+    }
+
+    protected function setCommandCache($owner_id, $timestamp)
+    {
+        return file_put_contents($this->getCacheFilename($owner_id), $timestamp);
+    }
+
+    private function getCacheFilename($id): string
+    {
+        return $this->getCommandCacheDir() . $this->getName() . $id;
+    }
 }

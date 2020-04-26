@@ -1,17 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: mkiselev
- * Date: 11.04.2020
- * Time: 08:30
- */
 
-namespace App\Service\Handler;
-
+namespace App\Service\VK;
 
 use VK\Client\VKApiClient;
 
-class VKApi
+class Api
 {
     private $client;
     private $token;
