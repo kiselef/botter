@@ -14,11 +14,6 @@ class TodayCommand extends VkCommand
 
     public function execute(): void
     {
-
-        $text = 'Рисунок [id82459560|Татьяны Морышковой]';
-        $text = preg_replace('/\[(id\d+)\|(.+)\]/', '<a href="$1">$2</a>', $text);
-        var_dump($text); exit;
-
         if ($this->args) {
             $owner_id = $this->args[0];
             $limit = $this->args[1] ?? self::DEFAULT_POST_NUMBER;
