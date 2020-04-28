@@ -90,6 +90,7 @@ class TopStatCommand extends VkCommand
                 continue;
             }
             $result[] = new Post(array_merge($item, [
+                'name' => $vk_response['groups'][0]['name'],
                 'screen_name' => $vk_response['groups'][0]['screen_name']
             ]));
         }

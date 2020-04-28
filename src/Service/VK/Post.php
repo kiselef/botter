@@ -7,6 +7,7 @@ namespace App\Service\VK;
  * @property string $date
  * @property string $text
  * @property string $link_vk
+ * @property string $name
  * @property string $screen_name
  * @property array $attach
  * @property int $likes
@@ -34,6 +35,7 @@ class Post
             'reposts' => (int) $item['reposts']['count'],
             'comments' => (int) $item['comments']['count'],
             'likes' => (int) $item['likes']['count'],
+            'name' => $item['name'] ?? null,
             'screen_name' => $item['screen_name'] ?? null,
             'link_vk' => 'https://vk.com/wall-' . abs($item['owner_id']) . '_' . $item['id'],
         ];
