@@ -11,7 +11,7 @@ class TopStatCommand extends VkCommand
 {
     const
         DEFAULT_TOP_LIMIT   = 5,
-        DEFAULT_POST_NUMBER = 20;
+        DEFAULT_POST_NUMBER = 80;
 
     private $default_date_range = [
         'yesterday',
@@ -62,6 +62,11 @@ class TopStatCommand extends VkCommand
         usort($posts, function (Post $a, Post $b) {
             return $b->getPopularity() <=> $a->getPopularity();
         });
+
+
+        //var_dump($posts); exit;
+
+
 
         return array_slice($posts, 0, $limit);
     }
